@@ -15,6 +15,7 @@ import (
 	"github.com/cognusion/go-sequence"
 	"github.com/cognusion/prochydra/dictionary"
 	"github.com/cognusion/prochydra/head"
+	"github.com/cognusion/prochydra/lerna"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
@@ -37,6 +38,9 @@ var (
 	heads sync.Map                              // heads is a Map of all heads running that hydra is aware of
 	idSeq = sequence.NewWithHashIDLength(0, 14) // idSeq is for IDs
 	seq   = sequence.New(0)                     // seq is for heads to use in macros
+
+	proto    = "unix"
+	sockAddr = "/tmp/hydra.sock" // TODO: Make this config
 
 	conf *viper.Viper
 	dict dictionary.SimpleDict
@@ -151,11 +155,25 @@ func main() {
 		}
 	}()
 
+	serverStopChan, serverErr := lerna.Run(proto, sockAddr, ErrorOut, DebugOut)
+	if serverErr != nil {
+		// TODO: Clearly wrong.
+		panic(serverErr)
+	}
+
 	// Fork off the INT/TERM signal handler
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		<-sigChan
+		// INT or TERM has been called
+		DebugOut.Println("INT or TERM signalled!")
+
+		// close the server if it's up
+		if serverStopChan != nil {
+			close(serverStopChan)
+		}
+
 		// Stop all heads
 		heads.Range(func(k, v interface{}) bool {
 			h := v.(*head.Head)

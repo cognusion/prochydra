@@ -2,6 +2,8 @@ github.com/Hellseher/go-shellquote v0.1.0 h1:T9+VA5gQ25+QAFNyKpCXsxc1zrrUk3vC2ut
 github.com/Hellseher/go-shellquote v0.1.0/go.mod h1:t4xAP6TrFpgvp/U7szp27rYrXXVu9yn3WhNylBvnfb8=
 github.com/cognusion/go-humanity v1.3.0 h1:06/WaNW34Osg/CLEddz6HVsPQ7FpCjuve5peTU1mz9k=
 github.com/cognusion/go-humanity v1.3.0/go.mod h1:5TovZd/sNx1ZT2BpkqgY0wjpu22ZMZTtKr+8EO+VJ6w=
+github.com/cognusion/go-recyclable v1.0.0 h1:lC8zPfPj0PWJ2t5XnAOgDPrSwfjW+rETi0z1SVNOkDw=
+github.com/cognusion/go-recyclable v1.0.0/go.mod h1:VXkJBUvCxDX2KTR+IcW5wPBtGGrWB/7kTSOCxiGzE50=
 github.com/cognusion/go-sequence v1.1.0 h1:MkYt6/iM4WaQh1WiuE1dnknwQEFdU0KBUbDf8ch6XPo=
 github.com/cognusion/go-sequence v1.1.0/go.mod h1:m1eTjD2rGredOjvHMTklg8Unb7mz5OMlFPyOG9dgLws=
 github.com/cognusion/go-slippycounter v1.0.0 h1:CYmCe7hdZsvYJE1TR6+P3BwmKUD8db/cak3F8WkNWF4=

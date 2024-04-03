@@ -5,6 +5,7 @@ go 1.22
 require (
 	github.com/Hellseher/go-shellquote v0.1.0
 	github.com/cognusion/go-humanity v1.3.0
+	github.com/cognusion/go-recyclable v1.0.0
 	github.com/cognusion/go-sequence v1.1.0
 	github.com/cognusion/go-slippycounter v1.0.0
 	github.com/cognusion/randomnames v1.0.0
