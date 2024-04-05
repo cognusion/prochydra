@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"strings"
 
 	sq "github.com/Hellseher/go-shellquote"
 	"github.com/cognusion/go-recyclable"
@@ -85,6 +86,10 @@ func handleConnection(conn net.Conn, requestChan chan<- greek.Request, outLog *l
 		io.WriteString(conn, "Request is improper\n")
 		return
 	}
+
+	// Make nouns and verbs lowercase
+	args[0] = strings.ToLower(args[0])
+	args[1] = strings.ToLower(args[1])
 
 	respChan := make(chan greek.Response)
 	requestChan <- greek.Request{

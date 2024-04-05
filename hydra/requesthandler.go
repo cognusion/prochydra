@@ -92,7 +92,7 @@ func handleRequest(req *greek.Request) {
 			return
 		case greek.Send:
 			// Send to specific Head
-			io.WriteString(h, data)
+			io.WriteString(h, data+"\n")
 			// TODO: grab stdout?
 			if req.Waiting {
 				io.WriteString(buf, "Head Written\n")
