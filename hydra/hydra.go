@@ -14,6 +14,7 @@ import (
 
 	"github.com/cognusion/go-sequence"
 	"github.com/cognusion/prochydra/dictionary"
+	"github.com/cognusion/prochydra/greek"
 	"github.com/cognusion/prochydra/head"
 	"github.com/cognusion/prochydra/lerna"
 	"github.com/spf13/pflag"
@@ -155,10 +156,26 @@ func main() {
 		}
 	}()
 
-	serverStopChan, serverErr := lerna.Run(proto, sockAddr, ErrorOut, DebugOut)
+	serverStopChan, serverRequestChan, serverErr := lerna.Run(proto, sockAddr, ErrorOut, DebugOut)
 	if serverErr != nil {
 		// TODO: Clearly wrong.
 		panic(serverErr)
+	}
+
+	if serverRequestChan != nil {
+		go func(src <-chan greek.Request) {
+			for {
+				select {
+				case req := <-serverRequestChan:
+					// Server has sent a request
+					go handleRequest(&req)
+				case <-serverStopChan:
+					// we done
+					return
+				}
+			}
+		}(serverRequestChan)
+
 	}
 
 	// Fork off the INT/TERM signal handler
