@@ -12,8 +12,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/cognusion/go-dictionary"
 	"github.com/cognusion/go-sequence"
-	"github.com/cognusion/prochydra/dictionary"
 	"github.com/cognusion/prochydra/greek"
 	"github.com/cognusion/prochydra/head"
 	"github.com/cognusion/prochydra/lerna"
