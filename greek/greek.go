@@ -33,6 +33,7 @@ type Request struct {
 	Noun    Noun
 	Data    string
 	Waiting bool
+	NoNL    bool
 	Chan    chan Response
 }
 
