@@ -166,8 +166,8 @@ func main() {
 	if conf.GetString("proto") != "" {
 		serverStopChan, serverRequestChan, serverErr = lerna.Run(conf.GetString("proto"), conf.GetString("address"), ErrorOut, DebugOut)
 		if serverErr != nil {
-			// TODO: Clearly wrong.
-			panic(serverErr)
+			ErrorOut.Fatalf("Error during server spinup: %s\n", serverErr)
+			return // superfluous
 		}
 
 		if serverRequestChan != nil {
