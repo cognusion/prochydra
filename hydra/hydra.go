@@ -40,9 +40,6 @@ var (
 	idSeq = sequence.NewWithHashIDLength(0, 14) // idSeq is for IDs
 	seq   = sequence.New(0)                     // seq is for heads to use in macros
 
-	proto    = "unix"
-	sockAddr = "/tmp/hydra.sock" // TODO: Make this config
-
 	conf *viper.Viper
 	dict dictionary.SimpleDict
 )
@@ -56,6 +53,10 @@ func init() {
 	pflag.String("exec", "", "Command to execute, if singular. Ignores many other options and should only be used for debugging")
 	pflag.Bool("autorestart", false, "Enable autorestarts. Set --restartdelay to sleep in between")
 	pflag.String("restartdelay", "0s", "Duration of wait between restarts, e.g. \"1s\" or \"100ms\"")
+
+	pflag.String("proto", "unix", "Protocol to use for server connections. Must be empty to disable, or one of 'tcp', 'tcp4', 'tcp6', 'unix'.")
+	pflag.String("address", "/tmp/hydra.sock", "Address for the server to listen to.")
+	pflag.Bool("nonl", false, "Newlines are appended by default when sending commands to heads. Set this to disable the appending.")
 
 	pflag.String("log", "", "Path to file to log to, else stderr")
 	pflag.String("outlog", "", "Path to file where stdout should log to, else stdout")
@@ -156,26 +157,33 @@ func main() {
 		}
 	}()
 
-	serverStopChan, serverRequestChan, serverErr := lerna.Run(proto, sockAddr, ErrorOut, DebugOut)
-	if serverErr != nil {
-		// TODO: Clearly wrong.
-		panic(serverErr)
-	}
+	var (
+		serverStopChan    chan struct{}
+		serverRequestChan <-chan greek.Request
+		serverErr         error
+	)
+	if conf.GetString("proto") != "" {
+		serverStopChan, serverRequestChan, serverErr = lerna.Run(conf.GetString("proto"), conf.GetString("address"), ErrorOut, DebugOut)
+		if serverErr != nil {
+			// TODO: Clearly wrong.
+			panic(serverErr)
+		}
 
-	if serverRequestChan != nil {
-		go func(src <-chan greek.Request) {
-			for {
-				select {
-				case req := <-serverRequestChan:
-					// Server has sent a request
-					go handleRequest(&req)
-				case <-serverStopChan:
-					// we done
-					return
+		if serverRequestChan != nil {
+			go func(src <-chan greek.Request) {
+				for {
+					select {
+					case req := <-serverRequestChan:
+						// Server has sent a request
+						go handleRequest(&req)
+					case <-serverStopChan:
+						// we done
+						return
+					}
 				}
-			}
-		}(serverRequestChan)
+			}(serverRequestChan)
 
+		}
 	}
 
 	// Fork off the INT/TERM signal handler

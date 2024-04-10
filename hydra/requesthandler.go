@@ -92,12 +92,11 @@ func handleRequest(req *greek.Request) {
 			return
 		case greek.Send:
 			// Send to specific Head
-			if req.NoNL {
-				// Do not append NL
-				io.WriteString(h, data)
-			} else {
-				io.WriteString(h, data+"\n")
+			if !req.NoNL {
+				// Append NL unless explicitly told not to.
+				data += "\n"
 			}
+			io.WriteString(h, data)
 			// TODO: grab stdout?
 			if req.Waiting {
 				io.WriteString(buf, "Head Written\n")
