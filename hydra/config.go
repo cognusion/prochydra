@@ -44,6 +44,8 @@ type HeadConfig struct {
 	// ChildEnvFile is a file of key=value pairs, one per line, that create the environment for the child processes
 	// if unset, the parent environment will be inherhited
 	ChildEnvFile string
+	// StdInNoNL is a boolean to advise if a newline should *not* be appended to commands sent via stdin.
+	StdInNoNL bool
 }
 
 // ValueSwitch returns -1 if the v is nil or not an int, otherwise returns the int value

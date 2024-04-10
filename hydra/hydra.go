@@ -232,6 +232,7 @@ func main() {
 		h.StdOut = StdOut
 		h.Seq = seq
 		h.MaxPSS = conf.GetInt64("maxpss")
+		h.StdInNoNL = conf.GetBool("nonl")
 
 		// Add this head to the list and waitgroup
 		h.ID = idSeq.NextHashID()
@@ -281,6 +282,7 @@ func main() {
 			h.DebugOut = DebugOut
 			h.ErrOut = ErrorOut
 			h.Seq = seq
+			h.StdInNoNL = hc.StdInNoNL
 
 			if hc.ChildEnvFile != "" {
 				content, err := os.ReadFile(hc.ChildEnvFile)
