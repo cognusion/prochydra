@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	sq "github.com/Hellseher/go-shellquote"
 	"github.com/cognusion/go-recyclable"
@@ -76,7 +77,14 @@ func handleRequest(req *greek.Request) {
 		}
 		// We should have a valid head now!
 		h := v.(*head.Head)
-		data := sq.Join(rd[1:]...)
+		var data string
+		if h.StdInShellEscapeInput {
+			// Should be shell-escaped.
+			data = sq.Join(rd[1:]...)
+		} else {
+			// Don't care
+			data = strings.Join(rd[1:], " ")
+		}
 
 		switch req.Verb {
 		case greek.Stop:

@@ -51,6 +51,9 @@ type Head struct {
 	// StdInNoNL is a boolean to describe if a NewLine should *not* be appended to lines written to StdIn.
 	// This is advisory-only, and respected by hydra but not necessarily others.
 	StdInNoNL bool
+	// StdInShellEscapeInput is a boolean to describe if strings send to StdIn should be shell-escaped.
+	// This is advisory-only, and respected by hydra but not necessarily others.
+	StdInShellEscapeInput bool
 
 	wg           sync.WaitGroup
 	restarts     uint64
@@ -117,6 +120,7 @@ func (r *Head) Clone() *Head {
 	c.Values = *copyValues(&r.Values)
 	c.Timeout = r.Timeout
 	c.StdInNoNL = r.StdInNoNL
+	c.StdInShellEscapeInput = r.StdInShellEscapeInput
 
 	return c
 }

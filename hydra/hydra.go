@@ -57,6 +57,7 @@ func init() {
 	pflag.String("proto", "unix", "Protocol to use for server connections. Must be empty to disable, or one of 'tcp', 'tcp4', 'tcp6', 'unix'.")
 	pflag.String("address", "/tmp/hydra.sock", "Address for the server to listen to.")
 	pflag.Bool("nonl", false, "Newlines are appended by default when sending commands to heads. Set this to disable the appending.")
+	pflag.Bool("shellescape", true, "Shell-escape input before sending it to stdin.")
 
 	pflag.String("log", "", "Path to file to log to, else stderr")
 	pflag.String("outlog", "", "Path to file where stdout should log to, else stdout")
@@ -233,6 +234,7 @@ func main() {
 		h.Seq = seq
 		h.MaxPSS = conf.GetInt64("maxpss")
 		h.StdInNoNL = conf.GetBool("nonl")
+		h.StdInShellEscapeInput = conf.GetBool("shellescape")
 
 		// Add this head to the list and waitgroup
 		h.ID = idSeq.NextHashID()
@@ -283,6 +285,7 @@ func main() {
 			h.ErrOut = ErrorOut
 			h.Seq = seq
 			h.StdInNoNL = hc.StdInNoNL
+			h.StdInShellEscapeInput = hc.StdInShellEscapeInput
 
 			if hc.ChildEnvFile != "" {
 				content, err := os.ReadFile(hc.ChildEnvFile)

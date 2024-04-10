@@ -46,6 +46,8 @@ type HeadConfig struct {
 	ChildEnvFile string
 	// StdInNoNL is a boolean to advise if a newline should *not* be appended to commands sent via stdin.
 	StdInNoNL bool
+	// StdInShellEscapeInput is a boolean to advise if strings should be shell-escaped before being sent to stdin.
+	StdInShellEscapeInput bool
 }
 
 // ValueSwitch returns -1 if the v is nil or not an int, otherwise returns the int value
