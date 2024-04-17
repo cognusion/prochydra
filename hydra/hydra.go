@@ -14,7 +14,9 @@ import (
 
 	"github.com/cognusion/go-dictionary"
 	"github.com/cognusion/go-sequence"
+	"github.com/cognusion/prochydra/greek"
 	"github.com/cognusion/prochydra/head"
+	"github.com/cognusion/prochydra/lerna"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
@@ -51,6 +53,11 @@ func init() {
 	pflag.String("exec", "", "Command to execute, if singular. Ignores many other options and should only be used for debugging")
 	pflag.Bool("autorestart", false, "Enable autorestarts. Set --restartdelay to sleep in between")
 	pflag.String("restartdelay", "0s", "Duration of wait between restarts, e.g. \"1s\" or \"100ms\"")
+
+	pflag.String("proto", "unix", "Protocol to use for server connections. Must be empty to disable, or one of 'tcp', 'tcp4', 'tcp6', 'unix'.")
+	pflag.String("address", "/tmp/hydra.sock", "Address for the server to listen to.")
+	pflag.Bool("nonl", false, "Newlines are appended by default when sending commands to heads. Set this to disable the appending.")
+	pflag.Bool("shellescape", true, "Shell-escape input before sending it to stdin.")
 
 	pflag.String("log", "", "Path to file to log to, else stderr")
 	pflag.String("outlog", "", "Path to file where stdout should log to, else stdout")
@@ -151,11 +158,48 @@ func main() {
 		}
 	}()
 
+	var (
+		serverStopChan    chan struct{}
+		serverRequestChan <-chan greek.Request
+		serverErr         error
+	)
+	if conf.GetString("proto") != "" {
+		serverStopChan, serverRequestChan, serverErr = lerna.Run(conf.GetString("proto"), conf.GetString("address"), ErrorOut, DebugOut)
+		if serverErr != nil {
+			ErrorOut.Fatalf("Error during server spinup: %s\n", serverErr)
+			return // superfluous
+		}
+
+		if serverRequestChan != nil {
+			go func(src <-chan greek.Request) {
+				for {
+					select {
+					case req := <-serverRequestChan:
+						// Server has sent a request
+						go handleRequest(&req)
+					case <-serverStopChan:
+						// we done
+						return
+					}
+				}
+			}(serverRequestChan)
+
+		}
+	}
+
 	// Fork off the INT/TERM signal handler
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		<-sigChan
+		// INT or TERM has been called
+		DebugOut.Println("INT or TERM signalled!")
+
+		// close the server if it's up
+		if serverStopChan != nil {
+			close(serverStopChan)
+		}
+
 		// Stop all heads
 		heads.Range(func(k, v interface{}) bool {
 			h := v.(*head.Head)
@@ -189,6 +233,8 @@ func main() {
 		h.StdOut = StdOut
 		h.Seq = seq
 		h.MaxPSS = conf.GetInt64("maxpss")
+		h.StdInNoNL = conf.GetBool("nonl")
+		h.StdInShellEscapeInput = conf.GetBool("shellescape")
 
 		// Add this head to the list and waitgroup
 		h.ID = idSeq.NextHashID()
@@ -238,6 +284,8 @@ func main() {
 			h.DebugOut = DebugOut
 			h.ErrOut = ErrorOut
 			h.Seq = seq
+			h.StdInNoNL = hc.StdInNoNL
+			h.StdInShellEscapeInput = hc.StdInShellEscapeInput
 
 			if hc.ChildEnvFile != "" {
 				content, err := os.ReadFile(hc.ChildEnvFile)
