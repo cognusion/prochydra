@@ -48,7 +48,7 @@ ReadLogger continuously reads from an io.Reader, and blurts to the specified log
 
 
 
-## <a name="Head">type</a> [Head](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=442:1893#L26)
+## <a name="Head">type</a> [Head](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=442:2298#L26)
 ``` go
 type Head struct {
     // ID is a generated ID based on the sequence
@@ -75,6 +75,12 @@ type Head struct {
     Values sync.Map
     // Timeout is a duration after which the process running is stopped, subject to  Autorestart
     Timeout time.Duration
+    // StdInNoNL is a boolean to describe if a NewLine should *not* be appended to lines written to StdIn.
+    // This is advisory-only, and respected by hydra but not necessarily others.
+    StdInNoNL bool
+    // StdInShellEscapeInput is a boolean to describe if strings send to StdIn should be shell-escaped.
+    // This is advisory-only, and respected by hydra but not necessarily others.
+    StdInShellEscapeInput bool
     // contains filtered or unexported fields
 }
 
@@ -88,14 +94,14 @@ you need clones.
 
 
 
-### <a name="BashDashC">func</a> [BashDashC](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=1995:2053#L71)
+### <a name="BashDashC">func</a> [BashDashC](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=2400:2458#L77)
 ``` go
 func BashDashC(command string, errorChan chan error) *Head
 ```
 BashDashC creates a head that handles the command in its entirety running as a "bash -c command"
 
 
-### <a name="New">func</a> [New](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=2310:2377#L78)
+### <a name="New">func</a> [New](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=2715:2782#L84)
 ``` go
 func New(command string, args []string, errorChan chan error) *Head
 ```
@@ -107,7 +113,7 @@ Run() to prevent goro plaque.
 
 
 
-### <a name="Head.Autorestart">func</a> (\*Head) [Autorestart](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=3774:3811#L133)
+### <a name="Head.Autorestart">func</a> (\*Head) [Autorestart](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=4257:4294#L141)
 ``` go
 func (r *Head) Autorestart(doit bool)
 ```
@@ -116,7 +122,7 @@ Autorestart sets whether or not we will automatically restart Heads that "comple
 
 
 
-### <a name="Head.Clone">func</a> (\*Head) [Clone](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=3022:3050#L102)
+### <a name="Head.Clone">func</a> (\*Head) [Clone](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=3427:3455#L108)
 ``` go
 func (r *Head) Clone() *Head
 ```
@@ -125,7 +131,7 @@ Clone returns a new Head intialized the same as the current
 
 
 
-### <a name="Head.Errors">func</a> (\*Head) [Errors](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=8851:8881#L328)
+### <a name="Head.Errors">func</a> (\*Head) [Errors](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=9334:9364#L336)
 ``` go
 func (r *Head) Errors() uint64
 ```
@@ -134,7 +140,7 @@ Errors returns the current number of errors sent to the error chan
 
 
 
-### <a name="Head.Restarts">func</a> (\*Head) [Restarts](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=8998:9030#L333)
+### <a name="Head.Restarts">func</a> (\*Head) [Restarts](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=9481:9513#L341)
 ``` go
 func (r *Head) Restarts() uint64
 ```
@@ -143,7 +149,7 @@ Restarts returns the current number of restarts for this Head instance
 
 
 
-### <a name="Head.RestartsPerMinute">func</a> (\*Head) [RestartsPerMinute](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=9172:9213#L339)
+### <a name="Head.RestartsPerMinute">func</a> (\*Head) [RestartsPerMinute](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=9655:9696#L347)
 ``` go
 func (r *Head) RestartsPerMinute() uint64
 ```
@@ -153,7 +159,7 @@ the last minute
 
 
 
-### <a name="Head.Run">func</a> (\*Head) [Run](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=4414:4441#L151)
+### <a name="Head.Run">func</a> (\*Head) [Run](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=4897:4924#L159)
 ``` go
 func (r *Head) Run() string
 ```
@@ -164,7 +170,7 @@ running, or closes it without a value if it will not run.
 
 
 
-### <a name="Head.SetChildEnv">func</a> (\*Head) [SetChildEnv](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=3623:3663#L128)
+### <a name="Head.SetChildEnv">func</a> (\*Head) [SetChildEnv](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=4106:4146#L136)
 ``` go
 func (r *Head) SetChildEnv(env []string)
 ```
@@ -173,7 +179,7 @@ SetChildEnv takes a list of key=value strings to pass to all spawned processes
 
 
 
-### <a name="Head.SetMgInterval">func</a> (\*Head) [SetMgInterval](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=3954:4006#L139)
+### <a name="Head.SetMgInterval">func</a> (\*Head) [SetMgInterval](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=4437:4489#L147)
 ``` go
 func (r *Head) SetMgInterval(interval time.Duration)
 ```
@@ -183,7 +189,7 @@ Default 30s.
 
 
 
-### <a name="Head.Stop">func</a> (\*Head) [Stop](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=8512:8533#L319)
+### <a name="Head.Stop">func</a> (\*Head) [Stop](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=8995:9016#L327)
 ``` go
 func (r *Head) Stop()
 ```
@@ -193,7 +199,7 @@ output thereafter.
 
 
 
-### <a name="Head.String">func</a> (\*Head) [String](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=4100:4130#L144)
+### <a name="Head.String">func</a> (\*Head) [String](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=4583:4613#L152)
 ``` go
 func (r *Head) String() string
 ```
@@ -202,7 +208,7 @@ String returns the original command and arguments in a line
 
 
 
-### <a name="Head.Wait">func</a> (\*Head) [Wait](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=9310:9331#L344)
+### <a name="Head.Wait">func</a> (\*Head) [Wait](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=9793:9814#L352)
 ``` go
 func (r *Head) Wait()
 ```
@@ -211,7 +217,7 @@ Wait blocks until the Run() process has completed
 
 
 
-### <a name="Head.Write">func</a> (\*Head) [Write](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=3413:3462#L121)
+### <a name="Head.Write">func</a> (\*Head) [Write](https://github.com/cognusion/prochydra/tree/master/head/head.go?s=3896:3945#L129)
 ``` go
 func (r *Head) Write(p []byte) (n int, err error)
 ```
