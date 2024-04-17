@@ -98,7 +98,7 @@ func handleRequest(req *greek.Request) {
 				}
 			}
 			return
-		case greek.Send:
+		case greek.Send, greek.Connect:
 			// Send to specific Head
 			if !h.StdInNoNL {
 				// Append NL unless explicitly told not to.

@@ -10,6 +10,7 @@ const (
 	Stop    = Verb("stop")
 	Exec    = Verb("exec")
 	Send    = Verb("send")
+	Connect = Verb("connect")
 	NilVerb = Verb("")
 )
 
@@ -57,6 +58,8 @@ func ToVerb(s string) Verb {
 		return Send
 	case "exec":
 		return Exec
+	case "connect":
+		return Connect
 	default:
 		return NilVerb
 	}
