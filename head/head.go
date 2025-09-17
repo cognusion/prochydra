@@ -5,6 +5,7 @@ import (
 	"github.com/cognusion/go-slippycounter"
 	"github.com/cognusion/prochydra/athena"
 	"github.com/cognusion/randomnames"
+	"github.com/spf13/cast"
 
 	sq "github.com/Hellseher/go-shellquote"
 
@@ -217,6 +218,7 @@ func (r *Head) Run() string {
 				lctx, lcancel = context.WithTimeout(r.ctx, r.Timeout)
 			}
 
+			//#nosec G204 -- Yes. We have to trust the configs.
 			cmd = exec.CommandContext(lctx, lcommand, largs...)
 
 			if r.UID > 0 {
@@ -345,7 +347,7 @@ func (r *Head) Restarts() uint64 {
 // RestartsPerMinute returns the number of restarts for this Head instance in
 // the last minute
 func (r *Head) RestartsPerMinute() uint64 {
-	return uint64(r.restartsMin.Count())
+	return cast.ToUint64(r.restartsMin.Count())
 }
 
 // Wait blocks until the Run() process has completed

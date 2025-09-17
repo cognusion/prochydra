@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/spf13/viper"
-
 	"fmt"
 	"os"
+	"path"
 	"strings"
 	"time"
+
+	"github.com/spf13/viper"
 )
 
 // HeadConfig is a configuration struct for object-based configs
@@ -95,7 +96,7 @@ func LoadConfig(configFilename string) (*viper.Viper, error) {
 			return nil, fmt.Errorf("unable to locate Config file '%s'.(%s)", configFilenames[0], err)
 		}
 		for _, configFile := range configFilenames[1:] {
-			file, err := os.Open(configFile) // For read access.
+			file, err := os.Open(path.Clean(configFile)) // For read access.
 			if err != nil {
 				return nil, fmt.Errorf("unable to open config file '%s': %s", configFile, err)
 			}

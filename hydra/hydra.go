@@ -337,14 +337,14 @@ func main() {
 				DebugOut.Printf("\tHeadC Custom UID: %d\n", hc.UID)
 				h.UID = hc.UID
 			} else {
-				h.UID = uint32(conf.GetInt("uid"))
+				h.UID = conf.GetUint32("uid")
 			}
 
 			if hc.GID > 0 {
 				DebugOut.Printf("\tHeadC Custom GID: %d\n", hc.GID)
 				h.GID = hc.GID
 			} else {
-				h.GID = uint32(conf.GetInt("gid"))
+				h.GID = conf.GetUint32("gid")
 			}
 
 			if hc.RestartsCritOver == nil {
